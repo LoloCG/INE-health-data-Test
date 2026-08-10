@@ -13,18 +13,21 @@ ESdE_MICRO_METADATA_PATH = Path(r"references\metadata\esde_adult_2023")
 
 def read_raw_catalog(
     catalog:Path=RAW_ESdE_CATALOG_PATH
-)->None:
+)->list[dict]:
     if not catalog.is_file():
         raise FileNotFoundError(f"Catalogo de variables no encontrado: {catalog}")
 
     wb = load_workbook(filename = catalog) # read_only=True would cause hyperlinks and merged cells to not work properly
 
     sheet_diseño:worksheet = wb['Diseño']
-    extract_sheet_diseño(sheet_diseño)
+    dictionary_list = extract_sheet_diseño(sheet_diseño,max_col=30)
 
-    return
+    return dictionary_list
 
-def extract_sheet_diseño(wsheet:worksheet):
+def extract_sheet_diseño(
+    wsheet:worksheet,
+    max_col:int|None = 434
+)->list[dict]:
     header_type_list = wsheet['A2':'J2'][0] # Select the only existing row
 
     dictionary_list:list[dict] = []
@@ -49,12 +52,12 @@ def extract_sheet_diseño(wsheet:worksheet):
         row_map["Grupo"] = variable_group
         dictionary_list.append(row_map)
 
-    return 
+    return dictionary_list
 
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    read_raw_catalog()
+    dictionary_list = read_raw_catalog()
 
     for map in dictionary_list:
         logging.info(map)
