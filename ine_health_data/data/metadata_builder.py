@@ -29,10 +29,10 @@ It could later be normalized by separating into different files for cross refere
 '''
 from pathlib import Path
 import json
-from openpyxl import Workbook, load_workbook, worksheet
+from openpyxl import load_workbook, worksheet
 import logging
 
-wb = Workbook()
+# wb = Workbook()
 
 # Path for the original raw catalogue supplied from INE
 RAW_ESdE_CATALOG_PATH = Path(r"data\raw\datos_2023\ESdEadulto_2023\dr_ESdEadulto_2023.xlsx")
@@ -53,6 +53,37 @@ def read_raw_catalog(
     sheet_diseño:worksheet = wb['Diseño']
     dictionary_list = extract_sheet_diseño(sheet_diseño)
 
+    var_label_cache = {}
+    # n=0
+    for var_dict in dictionary_list:
+        table_num_str = var_dict["Diccionario ubicado en la hoja…"]
+        if table_num_str is None: continue
+
+        # Original source column is not normalized
+        table_num_norm:str=table_num_str.replace(" ", "")
+        
+        var_dict_name:str = var_dict["Diccionario de la variable"]
+
+        cached_label = var_label_cache.get(var_dict_name)
+        if cached_label is None:
+            table_ws:worksheet = wb[table_num_norm]
+
+            new_labels:dict = get_variable_options_from_table(table_ws, var_dict_name)
+
+            var_label_cache[var_dict_name] = new_labels
+
+            var_dict["value_labels"] = new_labels
+            # logging.log(f"variable dictionary not cached: {labels}")
+
+        else:
+            labels = var_label_cache[var_dict_name]
+            var_dict["value_labels"] = labels
+            # logging.log(f"variable dictionary already cached: {labels}")
+        # break
+
+        # n+=1
+        # if n >= 80:
+        #     break
 
     return dictionary_list
 
@@ -115,5 +146,9 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     dictionary_list = read_raw_catalog()
 
+    n=0
     for map in dictionary_list:
         logging.info(map)
+        n+=1
+        if n >= 80:
+            break
