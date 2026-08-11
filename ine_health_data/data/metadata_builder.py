@@ -1,3 +1,32 @@
+'''
+Generates a list of maps, where the map structure for each variable is:
+[{
+    'Variable': 'CCAA', 
+    'Diccionario de la variable': 'TCCAA', 
+    'Longitud': 2, 
+    'Tipo': 'A', 
+    'Decimales': None, 
+    'Posición': 1, 
+    'Orden': 1, 
+    'Diccionario ubicado en la hoja…': 'Tablas1', 
+    'Descripción': 'Comunidad Autónoma de residencia', 
+    'Observaciones': None, 
+    'Grupo': 'DATOS DE IDENTIFICACIÓN ',
+    'value_labels':{
+        '01':'Andalucía',
+        '02':'...',
+    }
+},{
+}]
+
+This causes duplication of variable "value_labels".
+Codebook contains 432 variables. Even with repeated number of value labels, it does not request the usage of chunking or
+other optimization methods.
+
+Positive trait of this duplication is that it avoids lookups into multiple sources.
+It could later be normalized by separating into different files for cross referencing or through insertion into SQL with duplication removal.
+
+'''
 from pathlib import Path
 import json
 from openpyxl import Workbook, load_workbook, worksheet
@@ -16,24 +45,27 @@ def read_raw_catalog(
 )->list[dict]:
     if not catalog.is_file():
         raise FileNotFoundError(f"Catalogo de variables no encontrado: {catalog}")
-
-    wb = load_workbook(filename = catalog) # read_only=True would cause hyperlinks and merged cells to not work properly
+    
+    # read_only=True would cause hyperlinks and merged cells to not work properly
+    # data_only allows returning results rather than formulas in the cells.
+    wb = load_workbook(filename = catalog, data_only=True) 
 
     sheet_diseño:worksheet = wb['Diseño']
-    dictionary_list = extract_sheet_diseño(sheet_diseño,max_col=30)
+    dictionary_list = extract_sheet_diseño(sheet_diseño)
+
 
     return dictionary_list
 
 def extract_sheet_diseño(
     wsheet:worksheet,
-    max_col:int|None = 434
+    max_row:int|None = 434
 )->list[dict]:
     header_type_list = wsheet['A2':'J2'][0] # Select the only existing row
 
     dictionary_list:list[dict] = []
     variable_group:str|None = None
 
-    for row in wsheet.iter_rows(min_row=3, max_row=7, min_col=1, max_col=12):
+    for row in wsheet.iter_rows(min_row=3, max_row=max_row, min_col=1, max_col=12):
         row_map = {}
 
         for cell in row:
