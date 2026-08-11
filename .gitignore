@@ -4,6 +4,8 @@
 /data/raw/*
 !/data/raw/.gitkeep
 
+/references/metadata/esde_adult_2023.json
+
 # Private learning notes and unused template folders
 /.private_notes/
 /docs/
