@@ -37,6 +37,11 @@ RAW_ESdE_CODEBOOK_PATH = Path(r"data\raw\datos_2023\ESdEadulto_2023\dr_ESdEadult
 # Path for the resulting json file
 ESdE_MICRO_METADATA_PATH = Path(r"references\metadata\esde_adult_2023")
 
+# Seems that the codebook points to incorrect tables for multiple variables.
+CODEBOOK_TABLE_OVERRIDES = {
+    "T3H": "Tablas4",
+    "T4H": "Tablas4",
+}
 
 def extract_raw_codebook(
     codebook:Path=RAW_ESdE_CODEBOOK_PATH
@@ -62,6 +67,9 @@ def extract_raw_codebook(
         
         var_dict_name:str = var_dict["Diccionario de la variable"]
 
+        if var_dict_name in CODEBOOK_TABLE_OVERRIDES:
+            table_num_norm = CODEBOOK_TABLE_OVERRIDES[var_dict_name]
+            
         cached_label = var_label_cache.get(var_dict_name)
         if cached_label is None:
             table_ws:worksheet = wb[table_num_norm]
@@ -120,6 +128,10 @@ def get_variable_options_from_table(
             # logging.debug(f"found variable label {cell.value} at {cell.coordinate}")
             var_loc_cell = cell
             break
+
+    if var_loc_cell is None: 
+        raise RuntimeError(f"No variable options found for {var_dict_name} in {wsheet.title}.\n",
+                           f"Check for possible source-reference errors, and add them to CODEBOOK_TABLE_OVERRIDES in metadata_builder.py")
 
     labels={}
     start_row = var_loc_cell.row + 2
