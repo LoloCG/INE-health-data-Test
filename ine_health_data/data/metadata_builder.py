@@ -141,6 +141,22 @@ def get_variable_options_from_table(
         
     return labels
 
+def save_json(
+    codebook: list[dict],
+    output_path: Path = ESdE_MICRO_METADATA_PATH.with_suffix(".json"),
+) -> bool:
+    output_path = Path(output_path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    try:
+        with output_path.open("w", encoding="utf-8") as json_file:
+            json.dump(codebook, json_file, ensure_ascii=False, indent=2)
+    except (OSError, TypeError) as error:
+        logging.error("Could not write metadata JSON to %s: %s", output_path, error)
+        return False
+
+    logging.info("Wrote metadata JSON to %s", output_path)
+    return True
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
