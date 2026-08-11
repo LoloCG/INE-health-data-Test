@@ -86,6 +86,30 @@ def extract_sheet_diseño(
 
     return dictionary_list
 
+def get_variable_options_from_table(
+    wsheet:worksheet,
+    var_dict_name:str
+)->dict:
+    var_loc_cell = None
+    for (cell,) in wsheet.iter_rows(min_row=5, max_col=1): # "(cell,)" because it removes unnecesary tuple encapsulation.
+        if cell.value == var_dict_name:
+            # logging.info(f"found variable label {cell.value} at {cell.coordinate}")
+            var_loc_cell = cell
+            break
+
+    labels={}
+    start_row = var_loc_cell.row + 2
+    for code_cell, description_cell in wsheet.iter_rows(min_row=start_row, max_col=2):
+        if code_cell.value is None and description_cell.value is None:
+            # This might be brittle, if there is empty row between the labels of the same variable.
+            # For now, it will suffice, as it seems there are no empty rows in 2023 dataset variable dictionary.
+            break 
+
+        # logging.info(f"({code_cell.value}) = {description_cell.value}")
+        labels[str(code_cell.value)] = description_cell.value
+        
+    return labels
+
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
