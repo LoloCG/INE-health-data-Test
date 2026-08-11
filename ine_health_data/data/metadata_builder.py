@@ -32,23 +32,21 @@ import json
 from openpyxl import load_workbook, worksheet
 import logging
 
-# wb = Workbook()
-
-# Path for the original raw catalogue supplied from INE
-RAW_ESdE_CATALOG_PATH = Path(r"data\raw\datos_2023\ESdEadulto_2023\dr_ESdEadulto_2023.xlsx")
+# Path for the original raw codebook supplied from INE
+RAW_ESdE_CODEBOOK_PATH = Path(r"data\raw\datos_2023\ESdEadulto_2023\dr_ESdEadulto_2023.xlsx")
 # Path for the resulting json file
 ESdE_MICRO_METADATA_PATH = Path(r"references\metadata\esde_adult_2023")
 
 
-def read_raw_catalog(
-    catalog:Path=RAW_ESdE_CATALOG_PATH
+def extract_raw_codebook(
+    codebook:Path=RAW_ESdE_CODEBOOK_PATH
 )->list[dict]:
-    if not catalog.is_file():
-        raise FileNotFoundError(f"Catalogo de variables no encontrado: {catalog}")
+    if not codebook.is_file():
+        raise FileNotFoundError(f"Catalogo de variables no encontrado: {codebook}")
     
     # read_only=True would cause hyperlinks and merged cells to not work properly
     # data_only allows returning results rather than formulas in the cells.
-    wb = load_workbook(filename = catalog, data_only=True) 
+    wb = load_workbook(filename = codebook, data_only=True) 
 
     sheet_diseño:worksheet = wb['Diseño']
     dictionary_list = extract_sheet_diseño(sheet_diseño)
@@ -73,17 +71,12 @@ def read_raw_catalog(
             var_label_cache[var_dict_name] = new_labels
 
             var_dict["value_labels"] = new_labels
-            # logging.log(f"variable dictionary not cached: {labels}")
+            # logging.debug(f"variable dictionary not cached: {labels}")
 
         else:
             labels = var_label_cache[var_dict_name]
             var_dict["value_labels"] = labels
-            # logging.log(f"variable dictionary already cached: {labels}")
-        # break
-
-        # n+=1
-        # if n >= 80:
-        #     break
+            # logging.debug(f"variable dictionary already cached: {labels}")
 
     return dictionary_list
 
@@ -124,7 +117,7 @@ def get_variable_options_from_table(
     var_loc_cell = None
     for (cell,) in wsheet.iter_rows(min_row=5, max_col=1): # "(cell,)" because it removes unnecesary tuple encapsulation.
         if cell.value == var_dict_name:
-            # logging.info(f"found variable label {cell.value} at {cell.coordinate}")
+            # logging.debug(f"found variable label {cell.value} at {cell.coordinate}")
             var_loc_cell = cell
             break
 
@@ -159,12 +152,13 @@ def save_json(
     return True
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
-    dictionary_list = read_raw_catalog()
+    logging.basicConfig(level=logging.DEBUG)
+    dictionary_list = extract_raw_codebook()
+    save_json(dictionary_list)
 
-    n=0
-    for map in dictionary_list:
-        logging.info(map)
-        n+=1
-        if n >= 80:
-            break
+    # n=0
+    # for map in dictionary_list:
+    #     logging.info(map)
+    #     n+=1
+    #     if n >= 80:
+    #         break
