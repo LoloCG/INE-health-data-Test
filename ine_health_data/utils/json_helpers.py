@@ -4,10 +4,13 @@ from pathlib import Path
 from typing import Any
 
 def save_json(
-    data: list[dict],
+    data: Any,
     output_path: Path,
 ) -> bool:
-    # output_path = Path(output_path)
+    output_path = Path(output_path)
+    if not output_path.suffix:
+        output_path = output_path.with_suffix(".json")
+
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     try:
