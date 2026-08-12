@@ -35,13 +35,21 @@ import logging
 # Path for the original raw codebook supplied from INE
 RAW_ESdE_CODEBOOK_PATH = Path(r"data\raw\datos_2023\ESdEadulto_2023\dr_ESdEadulto_2023.xlsx")
 # Path for the resulting json file
-ESdE_MICRO_METADATA_PATH = Path(r"references\metadata\esde_adult_2023")
+CODEBOOK_OUTPUT_PATH = Path(r"references\metadata\esde_adult_2023")
 
 # Seems that the codebook points to incorrect tables for multiple variables.
 CODEBOOK_TABLE_OVERRIDES = {
     "T3H": "Tablas4",
     "T4H": "Tablas4",
 }
+
+def save_codebook():
+    dictionary_list = extract_raw_codebook()
+
+    from ..utils.json_helpers import save_json
+    save_json(data=dictionary_list, output_path=CODEBOOK_OUTPUT_PATH)
+    
+    return
 
 def extract_raw_codebook(
     codebook:Path=RAW_ESdE_CODEBOOK_PATH
@@ -148,15 +156,3 @@ def get_variable_options_from_table(
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
-    dictionary_list = extract_raw_codebook()
-
-    from ..utils.json_helpers import save_json
-
-    save_json(dictionary_list)
-
-    # n=0
-    # for map in dictionary_list:
-    #     logging.info(map)
-    #     n+=1
-    #     if n >= 80:
-    #         break

@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Any
 
 def save_json(
-    codebook: list[dict],
+    data: list[dict],
     output_path: Path,
 ) -> bool:
     # output_path = Path(output_path)
@@ -12,7 +12,7 @@ def save_json(
 
     try:
         with output_path.open("w", encoding="utf-8") as json_file:
-            json.dump(codebook, json_file, ensure_ascii=False, indent=2)
+            json.dump(data, json_file, ensure_ascii=False, indent=2)
     except (OSError, TypeError) as error:
         logging.error("Could not write metadata JSON to %s: %s", output_path, error)
         return False
