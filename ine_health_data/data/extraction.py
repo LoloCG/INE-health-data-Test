@@ -30,7 +30,6 @@ def extract_zip(
     logging.info("Extracted %s into %s", zip_path.name, output_dir)
     return output_dir
 
-
 def extract_all_raw_files(
     raw_dir: Path = RAW_DATA_DIR,
     output_dir: Path | None = None,
@@ -50,6 +49,7 @@ def extract_all_raw_files(
     processed: set[Path] = set()
 
     while True:
+        # TODO: possibly add extracted check to avoid re-extraction
         archives = [archive for archive in raw_dir.rglob("*.zip") if archive not in processed]
 
         if not archives:
@@ -62,7 +62,6 @@ def extract_all_raw_files(
             extracted_path = extract_zip(archive, archive_output_dir)
             processed.add(archive)
             extracted.append(extracted_path)
-
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
