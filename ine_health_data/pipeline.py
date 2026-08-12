@@ -14,3 +14,6 @@ def start_setup():
     save_json(data=code_dict, output_path=CODEBOOK_OUTPUT_PATH)
 
     return
+
+if __name__ == "__main__":
+    start_setup()

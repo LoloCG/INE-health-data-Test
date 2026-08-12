@@ -4,7 +4,7 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "ine_health_data"
-version = "0.0.1"
+version = "0.0.2"
 description = "Project dedicated to understand the usage of Spain's INE health data, and perform basic dhealth dataSci analysis"
 authors = [
   { name = "LoloCG" },
