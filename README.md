@@ -26,7 +26,11 @@ This project uses Python 3.13. From the project root in Windows Command Prompt:
 py -3.13 -m venv .venv
 .\.venv\Scripts\Activate.bat
 python -m pip install -r requirements.txt
+python -m pip install -e .
 ```
+
+The editable installation makes the local `ine_health_data` package available
+to scripts and notebooks while using source files.
 
 ## Data
 
