@@ -1,34 +1,37 @@
 '''
-Generates a list of maps, where the map structure for each variable is:
-[{
-    'Variable': 'CCAA', 
-    'Diccionario de la variable': 'TCCAA', 
-    'Longitud': 2, 
-    'Tipo': 'A', 
-    'Decimales': None, 
-    'Posición': 1, 
-    'Orden': 1, 
-    'Diccionario ubicado en la hoja…': 'Tablas1', 
-    'Descripción': 'Comunidad Autónoma de residencia', 
-    'Observaciones': None, 
-    'Grupo': 'DATOS DE IDENTIFICACIÓN ',
-    'value_labels':{
-        '01':'Andalucía',
-        '02':'...',
+Generates a map keyed by variable code, where the structure for each variable is:
+{
+    'CCAA': {
+        'Variable': 'CCAA', 
+        'Diccionario de la variable': 'TCCAA', 
+        'Longitud': 2, 
+        'Tipo': 'A', 
+        'Decimales': None, 
+        'Posición': 1, 
+        'Orden': 1, 
+        'Diccionario ubicado en la hoja…': 'Tablas1', 
+        'Descripción': 'Comunidad Autónoma de residencia', 
+        'Observaciones': None, 
+        'Grupo': 'DATOS DE IDENTIFICACIÓN ',
+        'value_labels':{
+            '01':'Andalucía',
+            '02':'...',
+        }
     }
-},{
-}]
+}
 
-This causes duplication of variable "value_labels".
+This causes duplication of "value_labels" when multiple variables share the same dictionary.
 Codebook contains 432 variables. Even with repeated number of value labels, it does not request the usage of chunking or
 other optimization methods.
 
-Positive trait of this duplication is that it avoids lookups into multiple sources.
+Positive trait of this structure is that it allows direct lookups by variable code and avoids lookups into multiple sources.
 It could later be normalized by separating into different files for cross referencing or through insertion into SQL with duplication removal.
 
+Possible error source (not in the 2023 microdata set) is duplication of variable codes. Should not happen, but if it were to,
+it would overwrite the previous variable entry silently while building the map.
 '''
+
 from pathlib import Path
-import json
 from openpyxl import load_workbook, worksheet
 import logging
 
@@ -65,7 +68,7 @@ def extract_raw_codebook(
     dictionary_list = extract_sheet_diseño(sheet_diseño)
 
     var_label_cache = {}
-    # n=0
+    codebook_map = {}
     for var_dict in dictionary_list:
         table_num_str = var_dict["Diccionario ubicado en la hoja…"]
         if table_num_str is None: continue
@@ -94,7 +97,10 @@ def extract_raw_codebook(
             var_dict["value_labels"] = labels
             # logging.debug(f"variable dictionary already cached: {labels}")
 
-    return dictionary_list
+        var_name = var_dict['Variable']
+        codebook_map[var_name] = var_dict
+
+    return codebook_map
 
 def extract_sheet_diseño(
     wsheet:worksheet,
