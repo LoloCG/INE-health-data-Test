@@ -46,14 +46,6 @@ CODEBOOK_TABLE_OVERRIDES = {
     "T4H": "Tablas4",
 }
 
-def save_codebook():
-    dictionary_list = extract_raw_codebook()
-
-    from ..utils.json_helpers import save_json
-    save_json(data=dictionary_list, output_path=CODEBOOK_OUTPUT_PATH)
-    
-    return
-
 def extract_raw_codebook(
     codebook:Path=RAW_ESdE_CODEBOOK_PATH
 )->list[dict]:
@@ -159,6 +151,4 @@ def get_variable_options_from_table(
         labels[str(code_cell.value)] = description_cell.value
         
     return labels
-
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG)
+    

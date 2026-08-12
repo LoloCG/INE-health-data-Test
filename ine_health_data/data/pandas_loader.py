@@ -5,9 +5,10 @@ import json
 
 # If not modified, this will be the relative path of extraction of the CSV for ESdE Adultos 2023
 PATH_ESdE_MICRO_ADULT = Path(r"data\raw\datos_2023\ESdEadulto_2023\CSV\ESdEadulto_2023.tab")
+PATH_ESdE_CODEBOOK = Path(r"references\metadata\esde_adult_2023.json")
 
 def load_csv_df(
-    csv_file_path:Path=PATH_ESdE_MICRO_ADULT,
+    csv_file_path:Path,
     sep:str = "\t",
     columns: None| list[str] = None    
 )-> pd.DataFrame:
