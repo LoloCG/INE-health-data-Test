@@ -6,11 +6,14 @@ import json
 # If not modified, this will be the relative path of extraction of the CSV for ESdE Adultos 2023
 PATH_ESdE_MICRO_ADULT = Path(r"data\raw\datos_2023\ESdEadulto_2023\CSV\ESdEadulto_2023.tab")
 
-def load_csv_df(
-    csv_file_path:Path,
+def load_csv_df_raw(
+    csv_file_path:Path=PATH_ESdE_MICRO_ADULT, # Not sure if the function should remain path agnostic...
     sep:str = "\t",
     columns: None| list[str] = None    
 )-> pd.DataFrame:
+    '''
+        columns should be written as per "Variable" described in codebook sheet.        
+    '''
     if not csv_file_path.is_file(): raise FileNotFoundError(f"CSV file not found: {csv_file_path}")
 
     df = pd.read_csv(
@@ -23,4 +26,3 @@ def load_csv_df(
 
     return df
 
-    
