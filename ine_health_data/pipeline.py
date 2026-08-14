@@ -37,7 +37,14 @@ def load_variables(
     if unkn_var:
         raise KeyError(f"Variables not in the ESdE codebook: {unkn_var!r}")
 
-    return load_csv_df_raw(csv_file_path=RAW_ESdE_MICRODATA_PATH, columns=variables)
+    df = load_csv_df_raw(csv_file_path=RAW_ESdE_MICRODATA_PATH, columns=variables)
+    for column_name in df.columns:
+        variable_metadata = codebook.get(column_name)
+        if variable_metadata["Tipo"] == "N":
+            df[column_name] = pd.to_numeric(df[column_name],errors="raise")
+            logging.debug(f"Converted variable {column_name} to numeric.") 
+
+    return df
 
 def add_value_labels(
     df_raw:pd.DataFrame,
@@ -55,10 +62,6 @@ def add_value_labels(
             # logging.warning(f"Variable metadata for {column_name} is None")
             continue
 
-        if variable_metadata["Tipo"] == "N":
-            pd.to_numeric(df[column_name],errors="raise")
-            logging.debug(f"Converted variable {column_name} to numeric.")
-
         value_labels = variable_metadata.get("value_labels")
         if not value_labels:
             continue
@@ -70,7 +73,6 @@ def add_value_labels(
                 "Choose another suffix or set overwrite=True."
             )
         df[label_column_name] = df[column_name].map(value_labels)
-
 
     return df
 
