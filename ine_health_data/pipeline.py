@@ -1,17 +1,25 @@
-from data.codebook_builder import extract_raw_codebook
-from data.extraction import extract_all_raw_files
-from utils.json_helpers import save_json, load_json
-from data.pandas_loader import load_csv_df_raw
+from ine_health_data.data.codebook_builder import extract_raw_codebook
+from ine_health_data.data.extraction import extract_all_raw_files
+from ine_health_data.utils.json_helpers import save_json, load_json
+from ine_health_data.data.pandas_loader import load_csv_df_raw
 
 from pathlib import Path
 import pandas as pd
 import logging
 
-CODEBOOK_OUTPUT_PATH = Path(r"references\metadata\esde_adult_2023.json")
+# This is a sloppy solution. Will fix later...
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+CODEBOOK_OUTPUT_PATH = (
+    PROJECT_ROOT / "references" / "metadata" / "esde_adulto_2023.json"
+)
+RAW_DATA_DIR = PROJECT_ROOT / "data" / "raw"
+RAW_ESdE_DIRECTORY = RAW_DATA_DIR / "datos_2023" / "ESdEadulto_2023"
+RAW_ESdE_CODEBOOK_PATH = RAW_ESdE_DIRECTORY / "dr_ESdEadulto_2023.xlsx"
+RAW_ESdE_MICRODATA_PATH = RAW_ESdE_DIRECTORY / "CSV" / "ESdEadulto_2023.tab"
 
 def start_setup():
-    extract_all_raw_files()
-    code_dict = extract_raw_codebook()
+    extract_all_raw_files(raw_dir=RAW_DATA_DIR)
+    code_dict = extract_raw_codebook(RAW_ESdE_CODEBOOK_PATH)
     save_json(data=code_dict, output_path=CODEBOOK_OUTPUT_PATH)
 
     return

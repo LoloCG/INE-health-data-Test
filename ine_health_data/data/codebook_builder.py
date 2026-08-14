@@ -35,11 +35,6 @@ from pathlib import Path
 from openpyxl import load_workbook, worksheet
 import logging
 
-# Path for the original raw codebook supplied from INE
-RAW_ESdE_CODEBOOK_PATH = Path(r"data\raw\datos_2023\ESdEadulto_2023\dr_ESdEadulto_2023.xlsx")
-# Path for the resulting json file
-CODEBOOK_OUTPUT_PATH = Path(r"references\metadata\esde_adult_2023")
-
 # Seems that the codebook points to incorrect tables for multiple variables.
 CODEBOOK_TABLE_OVERRIDES = {
     "T3H": "Tablas4",
@@ -47,7 +42,7 @@ CODEBOOK_TABLE_OVERRIDES = {
 }
 
 def extract_raw_codebook(
-    codebook:Path=RAW_ESdE_CODEBOOK_PATH
+    codebook:Path
 )->list[dict]:
     if not codebook.is_file():
         raise FileNotFoundError(f"Catalogo de variables no encontrado: {codebook}")

@@ -4,9 +4,6 @@ import logging
 from zipfile import ZipFile
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-RAW_DATA_DIR = PROJECT_ROOT / "data" / "raw"
-
 def extract_zip(
     zip_path: Path,
     output_dir: Path | None = None,
@@ -31,7 +28,7 @@ def extract_zip(
     return output_dir
 
 def extract_all_raw_files(
-    raw_dir: Path = RAW_DATA_DIR,
+    raw_dir: Path,
     output_dir: Path | None = None,
 ) -> list[Path]:
     r"""
