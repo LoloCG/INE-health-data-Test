@@ -72,7 +72,11 @@ def add_value_labels(
                 f"Column '{label_column_name}' already exists. "
                 "Choose another suffix or set overwrite=True."
             )
-        df[label_column_name] = df[column_name].map(value_labels)
+
+        if variable_metadata["Tipo"] == "N":
+            df[label_column_name] = df[column_name].astype("string").map(value_labels)
+        else:
+            df[label_column_name] = df[column_name].map(value_labels)
 
     return df
 
