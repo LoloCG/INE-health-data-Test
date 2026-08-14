@@ -41,16 +41,19 @@ def load_variables(
 
 def add_value_labels(
     df_raw:pd.DataFrame,
-    codebook: dict[str, dict],
+    codebook: dict[str, dict]|None =None,
     overwrite: bool = False,
 )->pd.DataFrame:
+    if codebook is None: 
+        codebook = load_json(json_path=CODEBOOK_OUTPUT_PATH)
+
     df = df_raw.copy()
 
     for column_name in df.columns:
         variable_metadata = codebook.get(column_name)
 
         if variable_metadata is None:
-            logging.warning(f"Variable metadata for {column_name} is None")
+            # logging.warning(f"Variable metadata for {column_name} is None")
             continue
 
         value_labels = variable_metadata.get("value_labels")
