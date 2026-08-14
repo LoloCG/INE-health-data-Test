@@ -51,25 +51,26 @@ def add_value_labels(
 
     for column_name in df.columns:
         variable_metadata = codebook.get(column_name)
-
         if variable_metadata is None:
             # logging.warning(f"Variable metadata for {column_name} is None")
             continue
+
+        if variable_metadata["Tipo"] == "N":
+            pd.to_numeric(df[column_name],errors="raise")
+            logging.debug(f"Converted variable {column_name} to numeric.")
 
         value_labels = variable_metadata.get("value_labels")
         if not value_labels:
             continue
 
-
         label_column_name = f"{column_name}_label"
-
         if label_column_name in df.columns and not overwrite:
             raise ValueError(
                 f"Column '{label_column_name}' already exists. "
                 "Choose another suffix or set overwrite=True."
             )
-        
         df[label_column_name] = df[column_name].map(value_labels)
+
 
     return df
 
