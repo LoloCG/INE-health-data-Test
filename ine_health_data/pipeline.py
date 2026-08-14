@@ -22,7 +22,22 @@ def start_setup():
     code_dict = extract_raw_codebook(RAW_ESdE_CODEBOOK_PATH)
     save_json(data=code_dict, output_path=CODEBOOK_OUTPUT_PATH)
 
-    return
+def load_variables(
+    variables: str | list[str],
+    codebook_json_path:Path=CODEBOOK_OUTPUT_PATH
+)->pd.DataFrame:
+    codebook = load_json(codebook_json_path)
+
+    if isinstance(variables,str):
+        variables = [variables]
+
+    unkn_var = []
+    for var in variables:
+        if var not in codebook: unkn_var.append(var)
+    if unkn_var:
+        raise KeyError(f"Variables not in the ESdE codebook: {unkn_var!r}")
+
+    return load_csv_df_raw(csv_file_path=RAW_ESdE_MICRODATA_PATH, columns=variables)
 
 def add_value_labels(
     df_raw:pd.DataFrame,
@@ -54,6 +69,11 @@ def add_value_labels(
         df[label_column_name] = df[column_name].map(value_labels)
 
     return df
+
+def get_all_variables(
+)->list[str]:
+    codebook = load_json(json_path=CODEBOOK_OUTPUT_PATH)
+    return codebook.keys()
 
 if __name__ == "__main__":
     # start_setup()
