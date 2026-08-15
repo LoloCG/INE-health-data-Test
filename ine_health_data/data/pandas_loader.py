@@ -9,7 +9,8 @@ PATH_ESdE_MICRO_ADULT = Path(r"data\raw\datos_2023\ESdEadulto_2023\CSV\ESdEadult
 def load_csv_df_raw(
     csv_file_path:Path=PATH_ESdE_MICRO_ADULT, # Not sure if the function should remain path agnostic...
     sep:str = "\t",
-    columns: None| list[str] = None    
+    columns: None| list[str] = None,
+    keep_na: bool|None = True
 )-> pd.DataFrame:
     '''
         columns should be written as per "Variable" described in codebook sheet.        
@@ -21,7 +22,7 @@ def load_csv_df_raw(
         sep=sep,
         usecols=columns,
         dtype="string",
-        keep_default_na=False
+        keep_default_na=keep_na,
     )
 
     return df
