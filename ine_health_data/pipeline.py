@@ -28,19 +28,20 @@ def start_setup():
     save_json(data=code_dict, output_path=CODEBOOK_OUTPUT_PATH)
 
 def load_variables(
-    variables: str | list[str],
+    variables: str | list[str] | None = None,
     codebook_json_path:Path=CODEBOOK_OUTPUT_PATH
 )->pd.DataFrame:
     codebook = load_json(codebook_json_path)
 
-    if isinstance(variables,str):
-        variables = [variables]
+    if variables is not None:
+        if isinstance(variables,str):
+            variables = [variables]
 
-    unkn_var = []
-    for var in variables:
-        if var not in codebook: unkn_var.append(var)
-    if unkn_var:
-        raise KeyError(f"Variables not in the ESdE codebook: {unkn_var!r}")
+        unkn_var = []
+        for var in variables:
+            if var not in codebook: unkn_var.append(var)
+        if unkn_var:
+            raise KeyError(f"Variables not in the ESdE codebook: {unkn_var!r}")
 
     df = load_csv_df_raw(csv_file_path=RAW_ESdE_MICRODATA_PATH, columns=variables, keep_na=True)
     for column_name in df.columns:
