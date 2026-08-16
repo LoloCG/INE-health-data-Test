@@ -18,7 +18,12 @@ RAW_ESdE_CODEBOOK_PATH = RAW_ESdE_DIRECTORY / "dr_ESdEadulto_2023.xlsx"
 RAW_ESdE_MICRODATA_PATH = RAW_ESdE_DIRECTORY / "CSV" / "ESdEadulto_2023.tab"
 
 def start_setup():
-    extract_all_raw_files(raw_dir=RAW_DATA_DIR)
+    if not RAW_ESdE_MICRODATA_PATH.is_file() or not RAW_ESdE_CODEBOOK_PATH.is_file():
+        logging.debug(f"microdata files not found. Extracting zip file")
+        extract_all_raw_files(raw_dir=RAW_DATA_DIR)
+    else: 
+        logging.info(f"Skipping extraction of adult microdata: {RAW_ESdE_MICRODATA_PATH}")
+
     code_dict = extract_raw_codebook(RAW_ESdE_CODEBOOK_PATH)
     save_json(data=code_dict, output_path=CODEBOOK_OUTPUT_PATH)
 
@@ -37,7 +42,7 @@ def load_variables(
     if unkn_var:
         raise KeyError(f"Variables not in the ESdE codebook: {unkn_var!r}")
 
-    df = load_csv_df_raw(csv_file_path=RAW_ESdE_MICRODATA_PATH, columns=variables)
+    df = load_csv_df_raw(csv_file_path=RAW_ESdE_MICRODATA_PATH, columns=variables, keep_na=True)
     for column_name in df.columns:
         variable_metadata = codebook.get(column_name)
         if variable_metadata["Tipo"] == "N":
