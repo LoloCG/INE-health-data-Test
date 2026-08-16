@@ -91,6 +91,10 @@ def get_all_variables(
     codebook = load_json(json_path=CODEBOOK_OUTPUT_PATH)
     return codebook.keys()
 
+def get_codebook()->map:
+    codebook = load_json(json_path=CODEBOOK_OUTPUT_PATH)
+    return codebook
+
 if __name__ == "__main__":
     # start_setup()
     logging.basicConfig(level=logging.DEBUG)
