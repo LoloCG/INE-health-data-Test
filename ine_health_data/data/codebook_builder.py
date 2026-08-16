@@ -58,13 +58,16 @@ def extract_raw_codebook(
     codebook_map = {}
     for var_dict in dictionary_list:
         table_num_str = var_dict["Diccionario ubicado en la hoja…"]
-        if table_num_str is None: continue
+        var_dict_name:str = var_dict["Diccionario de la variable"]
+
+        if table_num_str is None:
+            var_name = var_dict['Variable']
+            var_dict["value_labels"] = None
+            codebook_map[var_name] = var_dict
+            continue
 
         # Original source column is not normalized
         table_num_norm:str=table_num_str.replace(" ", "")
-        
-        var_dict_name:str = var_dict["Diccionario de la variable"]
-
         if var_dict_name in CODEBOOK_TABLE_OVERRIDES:
             table_num_norm = CODEBOOK_TABLE_OVERRIDES[var_dict_name]
             
