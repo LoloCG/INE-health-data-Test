@@ -57,6 +57,23 @@ def add_value_labels(
     codebook: dict[str, dict]|None =None,
     overwrite: bool = False,
 )->pd.DataFrame:
+    """Return a copy of ``df_raw`` augmented with value-label columns.
+
+        It generates a column for each variable name column
+    ### DO NOT PASS DATAFRAMES WITH A LOT OF VARIABLES
+    
+    example output:
+    ```
+        SEXOa	EDADa	SEXOa_label	EDADa_label
+    0   1       75      Hombre	    NaN
+    1   2       96      Mujer	    NaN
+    2   2       74      Mujer	    NaN
+    ```
+
+    For each input variable with labels in the codebook, adds a
+    ``<variable>_label`` column containing the matching label. Existing label
+    columns raise an error unless ``overwrite`` is ``True``.
+    """
     if codebook is None: 
         codebook = load_json(json_path=CODEBOOK_OUTPUT_PATH)
 
