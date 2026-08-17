@@ -136,13 +136,15 @@ def is_nonresponse(
 
     return new_df
     
+def get_codebook()->map:
+    '''Used as getter abstraction for jupyter notebooks.'''
+    codebook = load_json(json_path=CODEBOOK_OUTPUT_PATH)
+    return codebook
+
+def get_variables_list(
 )->list[str]:
     codebook = load_json(json_path=CODEBOOK_OUTPUT_PATH)
     return codebook.keys()
-
-def get_codebook()->map:
-    codebook = load_json(json_path=CODEBOOK_OUTPUT_PATH)
-    return codebook
 
 if __name__ == "__main__":
     # start_setup()
