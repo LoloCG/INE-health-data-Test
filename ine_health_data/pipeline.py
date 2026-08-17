@@ -86,7 +86,56 @@ def add_value_labels(
 
     return df
 
-def get_all_variables(
+def is_nonresponse(
+    df:pd.DataFrame,
+    nona_labels: str | tuple[str,...] = ("No contesta", "No consta", "No aplicable"),
+    codebook=None
+)->pd.DataFrame:
+    """Return a Boolean mask for codebook-defined non-answer responses.
+
+    The returned DataFrame has the same index and columns as ``df``. A cell is
+    ``True`` when its raw value maps to one of ``nona_labels`` in that
+    variable's codebook; physical missing values remain ``False`` and should
+    be identified with :meth:`pandas.DataFrame.isna`. By default, the mask
+    includes ``No contesta``, ``No consta``, and ``No aplicable``. Columns not
+    present in the codebook are returned as ``False``.
+    """
+    if codebook is None: 
+        codebook = load_json(json_path=CODEBOOK_OUTPUT_PATH)
+
+    if isinstance(nona_labels, str):
+        nona_labels = (nona_labels,)   
+
+    new_df = df.copy()
+
+    for column_name in new_df.columns:
+        variable_metadata = codebook.get(column_name)
+        if variable_metadata is None:
+            new_df[column_name] = False
+            continue
+        
+        value_labels = variable_metadata.get("value_labels") or {}
+
+        nonresponse_codes = set()
+        for code, label in value_labels.items():
+            clean_label = label.strip()
+    
+            is_selected_label = any(
+                clean_label == requested_label
+                # This is required due to existing "No aplicable (nunca lo ha intentado)" label
+                or clean_label.startswith(f"{requested_label} ")
+                for requested_label in nona_labels
+            )
+
+            if is_selected_label:
+                nonresponse_codes.add(code)
+
+        new_df[column_name] = new_df[column_name].astype("string").isin(
+            nonresponse_codes
+        )
+
+    return new_df
+    
 )->list[str]:
     codebook = load_json(json_path=CODEBOOK_OUTPUT_PATH)
     return codebook.keys()
