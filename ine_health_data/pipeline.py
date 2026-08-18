@@ -153,6 +153,41 @@ def is_nonresponse(
 
     return new_df
     
+def get_metadata_df(
+    metadata_fields: str | set[str] | None = None,
+)->pd.DataFrame:
+    """Return codebook metadata with variable names as its row index.
+
+    The returned DataFrame is indexed by ``"Variable"`` (for example,
+    ``"SEXOa"`` or ``"CCAA"``), which makes it suitable for joining to
+    variable-level summaries. Its columns are metadata fields from the
+    codebook.
+
+    When ``metadata_fields`` is ``None``, every metadata field is returned.
+    Passing a field name or a set of field names selects only those columns;
+    the selected columns retain codebook order. For example,
+    ``get_metadata_df("Grupo")`` returns a DataFrame with one column,
+    ``"Grupo"``, while the variable names remain in the row index.
+    """
+    metadata_df = (
+        pd.DataFrame.from_dict(get_codebook(), orient="index")
+        .drop(columns="Variable")
+        .rename_axis("Variable")
+    )
+
+    if metadata_fields is None:
+        return metadata_df
+    if isinstance(metadata_fields, str):
+        metadata_fields = {metadata_fields}
+
+    unknown_fields = metadata_fields.difference(metadata_df.columns)
+    if unknown_fields:
+        raise KeyError(
+            f"Metadata field(s) not in the codebook: {sorted(unknown_fields)!r}"
+        )
+
+    return metadata_df.loc[:, metadata_df.columns.isin(metadata_fields)]
+
 def get_codebook()->map:
     '''Used as getter abstraction for jupyter notebooks.'''
     codebook = load_json(json_path=CODEBOOK_OUTPUT_PATH)
